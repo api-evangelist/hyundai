@@ -11,9 +11,9 @@ type: Index
 image: https://kinlane-productions.s3.amazonaws.com/apis-json/apis-json-logo.jpg
 tags:
   - Automobiles
-  - Vehicles
   - Cars
   - Connected Vehicles
+  - Vehicles
 created: '2025-02-25'
 modified: '2026-03-16'
 specificationVersion: '0.19'
@@ -26,8 +26,8 @@ apis:
       features.
     humanURL: https://developer.hyundai.com/
     tags:
-      - Connected Vehicles
       - Automotive
+      - Connected Vehicles
     properties:
       - type: Documentation
         url: https://developer.hyundai.com/
