@@ -40,6 +40,10 @@ apis:
       - type: Documentation
         url: https://developer.hyundai.com/
 common:
+  - type: GitHubOrganization
+    url: https://github.com/hyundai
+  - type: LinkedIn
+    url: https://www.linkedin.com/company/hyundai-motor-company
   - type: Website
     url: https://www.hyundai.com/
   - type: USWebsite
