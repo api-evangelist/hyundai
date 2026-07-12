@@ -40,6 +40,10 @@ apis:
       - type: Documentation
         url: https://developer.hyundai.com/
 common:
+  - type: VulnerabilityDisclosure
+    url: security/hyundai-vulnerability-disclosure.yml
+  - type: DomainSecurity
+    url: security/hyundai-domain-security.yml
   - type: GitHubOrganization
     url: https://github.com/hyundai
   - type: LinkedIn
