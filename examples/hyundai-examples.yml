@@ -1,0 +1,121 @@
+generated: '2026-09-13'
+method: searched
+source: https://developers.hyundai.com/api/v1/specification/contents/data/status_odometer
+provider: Hyundai
+providerId: hyundai
+note: >-
+  Hyundai publishes a worked success example and a worked error example for every one of
+  its 19 documented operations, plus request examples for the token endpoint and four
+  language code samples in the developer guide. These are the provider's own published
+  values, reproduced verbatim. Because there is no OpenAPI, they live only on the
+  specification pages — an agent cannot obtain them from a machine-readable contract.
+coverage:
+  operations_documented: 19
+  operations_with_success_example: 19
+  operations_with_error_example: 19
+  operations_with_request_example: 2
+  code_sample_languages: [html, javascript, java, nodejs]
+  code_samples_location: https://developers.hyundai.com/web/v1/hyundai/guide_api
+examples:
+  - operation: GET /api/v1/user/profile
+    kind: success
+    docs: https://developers.hyundai.com/web/v1/hyundai/specification/account/account_profile
+    body: |
+      {
+          "id": "12345680-5ca3-11e7-9d1d-95bfd5a660bc",
+          "email": "test@ccsp.com",
+          "name": "tester",
+          "mobileNum": "+821012345678",
+          "birthdate": "110111",
+          "lang": "en",
+          "social": true
+      }
+    note: Provider-published placeholder values, not real customer data.
+  - operation: POST /api/v1/user/oauth2/token
+    kind: request
+    docs: https://developers.hyundai.com/web/v1/hyundai/specification/account/account_token
+    body: 'grant_type=authorization_code&code={code}&redirect_uri={redirect_uri}'
+  - operation: POST /api/v1/user/oauth2/token
+    kind: success
+    body: |
+      {
+          "access_token": "***",
+          "token_type": "Bearer",
+          "refresh_token": "REDACTED_REFRESH_TOKEN_PLACEHOLDER",
+          "expires_in": 7200
+      }
+    note: >-
+      The access_token in Hyundai's own example is already masked as "***". The
+      refresh_token placeholder was a fake literal in the provider's docs and is replaced
+      here with an obviously-fake marker to keep the repository free of secret-shaped
+      strings.
+  - operation: GET /api/v1/car/status/{carId}/odometer
+    kind: success
+    docs: https://developers.hyundai.com/web/v1/hyundai/specification/data/status_odometer
+    body: |
+      {
+        "msgId": "5db9fc02-1b36-448e-9307-52761fd9ad92",
+        "odometers": [
+          {
+            "date": "20190821",
+            "unit": 1,
+            "value": 12320,
+            "timestamp": "20200114152139"
+          }
+        ]
+      }
+  - operation: GET /api/v1/car/profile/{carId}/contract
+    kind: success
+    docs: https://developers.hyundai.com/web/v1/hyundai/specification/data/carprofile_contract
+    body: |
+      {
+        "subscribeDate": "20180711",
+        "endDate": "20230710",
+        "msgId": "714dd6b9-af57-4c25-9630-0f0eef9175f9"
+      }
+  - operation: any data operation
+    kind: error
+    body: |
+      {
+        "errId": "123e4567-e89b-12d3-a456-426655440000",
+        "errCode": "4002",
+        "errMsg": "Invalid request body"
+      }
+    note: The same error example is repeated verbatim on all 19 specification pages.
+  - operation: GET /api/v1/user/oauth2/authorize
+    kind: success
+    docs: https://developers.hyundai.com/web/v1/hyundai/specification/account/account_authorize
+    body: |
+      HTTP/1.1 302 Found
+      Content-Length: 0
+      Location: https://www.example.com/auth/bluelink?code=A1B2C3&state=r_basicprofile
+  - operation: partner delete callback (outbound)
+    kind: success
+    docs: https://developers.hyundai.com/web/v1/hyundai/specification/data/partner_deletecallback
+    body: |
+      {
+        "type": "agreement",
+        "action": "reject",
+        "carId": "22e77efa-aff0-4b3c-a5a0-c4cde4674963"
+      }
+live_observed:
+  note: >-
+    Responses observed on the provider's public sample-test tier 2026-09-13, which confirm
+    the documented shapes against a running service. See sandbox/hyundai-sandbox.yml.
+  samples:
+    - operation: GET /api_sample/v1/car/status/{carId}/odometer
+      status: 200
+      body: '{"msgId":"...","odometers":[{"date":"20260913","unit":1,"value":120144.7,"timestamp":"20211102112408"}]}'
+      divergence: >-
+        The live value is a decimal (120144.7) while the documented field description says
+        "거리 수치 (소수점 절사)" — distance with the decimal truncated. Documentation and
+        runtime disagree.
+    - operation: GET /api_sample/v1/car/status/warning/{carId}/engineOil
+      status: 200
+      body: '{"msgId":"...","status":true}'
+    - operation: GET /api_sample/v1/car/status/{carId}/ev/charging
+      status: 200
+      body: '{"soc":100,"msgId":"...","targetSOC":{"plugType":0,"targetSOClevel":80},"timestamp":"20220223151513","remainTime":{...}}'
+      divergence: >-
+        targetSOC and remainTime are returned as objects; neither is broken out in the
+        published field table beyond a single row.

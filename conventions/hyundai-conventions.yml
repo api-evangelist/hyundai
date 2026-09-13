@@ -1,0 +1,147 @@
+generated: '2026-09-13'
+method: searched
+source: https://developers.hyundai.com/web/v1/hyundai/guide_api
+docs:
+  - https://developers.hyundai.com/web/v1/hyundai/specification/data
+  - https://developers.hyundai.com/web/v1/hyundai/specification/account
+  - https://developers.hyundai.com/web/v1/hyundai/guide_console
+provider: Hyundai
+providerId: hyundai
+api: Hyundai Developers Connected Car API
+base_url: https://prd.kr-ccapi.hyundai.com
+note: >-
+  Cross-cutting semantics read from the provider's own 19 published API specification
+  pages and the developer guide, plus live probes of the production host and the public
+  sample-test tier. No OpenAPI exists to derive from.
+auth:
+  style: OAuth 2.0 authorization code, Bearer access token on every call
+  client_auth: HTTP Basic (client_id:client_secret) on the token endpoint only
+  see: authentication/hyundai-authentication.yml
+versioning:
+  style: path
+  pattern: /api/v{n}/
+  current: v1
+  note: >-
+    Every documented operation sits under /api/v1/. The sample-test tier substitutes the
+    segment `api_sample` for `api` (/api_sample/v1/...). No version negotiation header, no
+    date-pinned versioning, and no published policy for how v2 would be introduced.
+pagination:
+  style: none
+  note: >-
+    No documented operation takes a limit, offset, cursor or page parameter. Collection
+    responses (carlist, odometers) return a bare array inside the envelope with no
+    pagination metadata and no documented cap.
+filtering:
+  supported: false
+expansion:
+  supported: false
+metadata:
+  supported: false
+request_id_tracing:
+  supported: true
+  response_body_field: msgId
+  response_body_note: >-
+    Every data operation returns `msgId`, documented as "요청 결과 확인을 위한 메시지 ID"
+    (a message ID for confirming the request result).
+  response_headers:
+    - name: Ccsp-Request-Id
+      observed: true
+      note: >-
+        Observed on live production responses 2026-09-13; on the 401 probe its value was
+        identical to the errId in the body, so errId and Ccsp-Request-Id are the same
+        correlation handle.
+    - name: Ccsp-Span-Id
+      observed: true
+      note: present but empty on the probed response
+  documented: partial
+  documented_note: msgId is documented per operation; the Ccsp-* headers are not documented anywhere.
+error_envelope:
+  shape: '{errId, errCode, errMsg}'
+  rfc9457: false
+  see: errors/hyundai-error-codes.yml
+rate_limit_signaling:
+  headers:
+    - X-RateLimit-Limit
+    - X-RateLimit-Remaining
+    - X-RateLimit-Reset
+  observed: true
+  documented: false
+  see: rate-limits/hyundai-rate-limits.yml
+content_types:
+  request:
+    - application/x-www-form-urlencoded (token endpoint and consent request)
+  response:
+    - application/json
+  note: Content-Type on reads is documented as optional with a default of application/json.
+date_formats:
+  date: YYYYMMDD (string, e.g. "20190821")
+  timestamp: YYYYMMDDHHmmSS (string, e.g. "20200114152139")
+  note: >-
+    Neither is ISO 8601 and neither carries a timezone. Vehicle timestamps are the time the
+    vehicle transmitted, not the time of the read, and can be years older than the response
+    — the live sample tier returned a 2021 timestamp on a 2026 read.
+units:
+  note: >-
+    Distance carries an integer unit enum rather than a named unit
+    (0: feet, 1: km, 2: meter, 3: miles). A client that ignores `unit` will misread the value.
+idempotency:
+  coverage: none
+  mechanism: none
+  header: null
+  scope: []
+  note: >-
+    No Idempotency-Key header, no request-deduplication token, and no replay-protection
+    language anywhere in the documentation. The surface is overwhelmingly read-only — 15 of
+    19 documented operations are GET — but the four mutating operations (token
+    issue/refresh/delete, third-party consent request) have no replay protection. Retrying
+    a token request simply mints another token.
+reversibility:
+  grade: documented
+  note: >-
+    Two of the three reversible actions on this surface have a documented reversal
+    operation, and NEITHER states a window. Graded `documented` rather than `verified` on
+    that basis. No window is asserted here that the provider does not state.
+  surfaces:
+    - action: Issue a user token
+      operation: POST /api/v1/user/oauth2/token (grant_type=authorization_code)
+      reversal: POST /api/v1/user/oauth2/token (grant_type=delete)
+      reversal_operation_name: 사용자 토큰 삭제 요청
+      window: null
+      window_note: >-
+        No window stated. The refresh token is documented as valid for 1 year, so the
+        practical outer bound on needing a deletion is that year, but the provider does not
+        frame it as a reversal window.
+      docs: https://developers.hyundai.com/web/v1/hyundai/specification/account/account_token
+    - action: Grant third-party personal-data provision consent
+      operation: POST /api/v1/car-service/terms/agreement
+      reversal: GET /api/v1/car-service/terms/reject
+      reversal_operation_name: 개인정보 제공 철회 요청
+      window: null
+      window_note: >-
+        No window stated. Withdrawal is a statutory right under Korean PIPA rather than a
+        product-defined window, and the provider documents no time limit.
+      docs: https://developers.hyundai.com/web/v1/hyundai/specification/data/service_termreject
+      consequence: >-
+        Withdrawal is propagated OUT to the partner as a delete-callback
+        ({"type":"agreement","action":"reject"}), and the provider states the partner must
+        then delete all data received through the API "immediately" per the Korean Personal
+        Information Protection Act and its Enforcement Decree. The reversal therefore
+        imposes a deletion obligation on the caller, not merely a loss of access.
+    - action: Read vehicle status / warning lights
+      operation: GET /api/v1/car/status/* and /api/v1/car/status/warning/*
+      reversal: na
+      window: na
+      note: read-only, nothing to reverse
+dry_run_mode:
+  supported: true
+  note: >-
+    Not a dry-run flag, but a genuinely equivalent rehearsal surface: the public sample-test
+    tier at https://dev.kr-ccapi.hyundai.com/api_sample/v1/ serves the same response shapes
+    against five fixture vehicles with no signup. See sandbox/hyundai-sandbox.yml.
+cross_links:
+  errors: errors/hyundai-error-codes.yml
+  lifecycle: lifecycle/hyundai-lifecycle.yml
+  authentication: authentication/hyundai-authentication.yml
+  rate_limits: rate-limits/hyundai-rate-limits.yml
+  sandbox: sandbox/hyundai-sandbox.yml
+  webhooks: asyncapi/hyundai-webhooks.yml

@@ -1,0 +1,82 @@
+generated: '2026-09-13'
+method: searched
+source: https://developers.hyundai.com/web/v1/hyundai/specification/data/partner_deletecallback
+provider: Hyundai
+providerId: hyundai
+asyncapi_spec_published: false
+asyncapi_note: >-
+  Hyundai publishes no AsyncAPI document and no event-catalog endpoint. It does publish one
+  real, fully specified outbound webhook, documented as a first-class API specification page
+  alongside the REST operations. Captured here as a webhook catalog rather than fabricated
+  into an AsyncAPI.
+summary: >-
+  A single compliance-driven callback. When a customer terminates connected-car service,
+  deletes a vehicle, or withdraws third-party data-provision consent, Hyundai POSTs a
+  notification to the partner's registered Callback URL. Receiving it obliges the partner
+  to delete the data it has already been given.
+transport: https
+direction: outbound (Hyundai -> partner)
+webhooks:
+  - id: partner-delete-callback
+    name: 데이터 조회 불가 상태 알림 (Data-unavailable notification)
+    method: POST
+    target: partner-registered Callback URL
+    registration: Console > Settings > Data API > Callback URL
+    docs: https://developers.hyundai.com/web/v1/hyundai/specification/data/partner_deletecallback
+    auth: >-
+      Not documented. The specification page states no signing scheme, no shared secret and
+      no verification header for the callback, which means a partner has no published way to
+      authenticate that a delete notification genuinely came from Hyundai.
+    retry_policy: not documented
+    delivery_guarantee: not documented
+    payload_fields:
+      - name: type
+        type: string
+        required: true
+        enum: [account, vehicle, agreement]
+        description: What the notification concerns
+      - name: action
+        type: string
+        required: true
+        enum: [delete, reject]
+        description: The callback event
+      - name: userId
+        type: string
+        required: false
+        description: Hyundai-issued unique user identifier
+      - name: carId
+        type: string
+        required: false
+        description: Hyundai-issued unique vehicle identifier
+      - name: vin
+        type: string
+        required: false
+        description: >-
+          Vehicle identification number, supplied only to services that hold VIN access
+          permission
+    events:
+      - type: account
+        action: delete
+        meaning: The customer's Hyundai account was deleted
+        carries: [userId]
+      - type: vehicle
+        action: delete
+        meaning: The vehicle was removed, or connected-car service on it was terminated
+        carries: [carId, vin]
+      - type: agreement
+        action: reject
+        meaning: The customer withdrew third-party personal-data provision consent
+        carries: [carId, vin]
+    obligation:
+      statement_ko: >-
+        개인정보보호법 및 개인정보보호법시행령에 따라 해당 알림을 받은 즉시, API를 통해 제공된
+        데이터를 일괄 삭제하고 서비스에서 지속 표출되지 않도록 조치해야 합니다.
+      statement_en: >-
+        Under the Personal Information Protection Act and its Enforcement Decree, the
+        partner must, immediately upon receiving this notification, delete in bulk all data
+        provided through the API and ensure it is no longer displayed in the service.
+      note: >-
+        This is the strongest runtime obligation on the whole surface: the webhook is not a
+        convenience notification, it is a statutory deletion trigger. An agent integrating
+        this API must implement the receiver, not just the reads.
+event_count: 4

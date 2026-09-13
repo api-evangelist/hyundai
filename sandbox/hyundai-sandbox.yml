@@ -1,0 +1,114 @@
+generated: '2026-09-13'
+method: probed
+source: https://developers.hyundai.com/api/v1/sampleTest/getSampleTestInfo
+docs: https://developers.hyundai.com/web/v1/hyundai/faqs
+provider: Hyundai
+providerId: hyundai
+summary: >-
+  Hyundai Developers ships a fully anonymous, callable sample-test tier. No account, no
+  project, no client credentials: the portal's own specification pages issue a public JWT
+  and five fixture vehicle IDs to any visitor, and the resulting calls return real
+  response payloads from a live host. Twelve of the nineteen documented operations are
+  exercisable this way. Verified end to end on 2026-09-13.
+modes:
+  - id: sample-test
+    name: 샘플테스트 (Sample Test)
+    public: true
+    signup_required: false
+    host: https://dev.kr-ccapi.hyundai.com
+    path_prefix: /api_sample/v1/
+    credential_source:
+      endpoint: "GET https://developers.hyundai.com/api/v1/sampleTest/getSampleTestInfo"
+      auth: none
+      returns:
+        - testToken (a short-lived bearer JWT, issuer "bluelink")
+        - carIdList (five fixture vehicle IDs)
+        - domain (the sample host)
+      note: >-
+        The token value is deliberately NOT stored in this repository. It is minted on
+        demand, it rotates, and it is secret-shaped. Fetch it from the endpoint above.
+    gateway: "Tyk (X-Generator: tyk.io observed on sample-tier responses)"
+  - id: development-project
+    name: 개발 프로젝트 (Development project)
+    public: false
+    signup_required: true
+    host: https://prd.kr-ccapi.hyundai.com
+    description: >-
+      After Hyundai integrated-account signup and console project registration, a project
+      is created as a "development project" and automatically granted call permission on
+      every available API. Developers may bind their OWN real vehicle if they are the
+      registered CCS (Bluelink) contract holder, and read live data from it. A daily
+      per-project call cap applies at this stage.
+      Real customer vehicle data is unreachable until the commercialization review passes.
+    test_vehicle_accounts: >-
+      The FAQ states test vehicle accounts are provided for members who own no vehicle,
+      with some restrictions noted as inherent to a test account.
+  - id: commercial-project
+    name: 상용화 프로젝트 (Commercial project)
+    public: false
+    signup_required: true
+    host: https://prd.kr-ccapi.hyundai.com
+    description: >-
+      Created automatically once the commercialization review is approved. Carries its own
+      Client ID / Client Secret, distinct from the development project's.
+fixtures:
+  vehicles:
+    - id: 6d97337b-eb53-467b-baf4-7faec6d7065e
+      label: 샘플차량1
+    - id: 3f979d64-1e57-4ead-90af-25da1756e206
+      label: 샘플차량2
+    - id: ce7dfc88-f6b3-41ad-9099-4eb57bce4944
+      label: 샘플차량3
+    - id: b23f1cd3-517c-4ac0-b574-cfc8eeca5fed
+      label: 샘플차량4
+    - id: 10cc6538-82b5-48aa-9d85-16416b8e07fb
+      label: 샘플차량5
+  note: Published verbatim by the provider's own sample-test endpoint; not invented here.
+probed_operations:
+  date: '2026-09-13'
+  vehicle_used: 6d97337b-eb53-467b-baf4-7faec6d7065e
+  results:
+    - path: /api_sample/v1/car/status/{carId}/odometer
+      status: 200
+    - path: /api_sample/v1/car/status/{carId}/dte
+      status: 200
+    - path: /api_sample/v1/car/status/{carId}/ev/battery
+      status: 200
+    - path: /api_sample/v1/car/status/{carId}/ev/charging
+      status: 200
+    - path: /api_sample/v1/car/status/warning/{carId}/lowFuel
+      status: 200
+    - path: /api_sample/v1/car/status/warning/{carId}/tirePressure
+      status: 200
+    - path: /api_sample/v1/car/status/warning/{carId}/lampWire
+      status: 200
+    - path: /api_sample/v1/car/status/warning/{carId}/smartKeyBattery
+      status: 200
+    - path: /api_sample/v1/car/status/warning/{carId}/washerFluid
+      status: 200
+    - path: /api_sample/v1/car/status/warning/{carId}/breakOil
+      status: 200
+    - path: /api_sample/v1/car/status/warning/{carId}/engineOil
+      status: 200
+    - path: /api_sample/v1/car/profile/{carId}/contract
+      status: 200
+    - path: /api_sample/v1/car/profile/carlist
+      status: 404
+      note: >-
+        Not part of the sample tier — the provider marks this operation sampleTestYn = N.
+        Recorded for completeness, not as a defect.
+  passing: 12
+  total_documented_operations: 19
+invalid_credential_behavior:
+  probe: sample-tier call with Authorization Bearer invalid
+  status: 403
+  body: '{"error": "Key not authorized:token contains an invalid number of segments"}'
+  note: >-
+    The sample tier is fronted by Tyk and returns the GATEWAY error shape here, not the
+    documented {errId, errCode, errMsg} envelope. A client that only parses the documented
+    envelope will fail to read this error.
+limitations:
+  - No write operations are exercisable; the sample tier is read-only.
+  - Account API operations (authorize, token, profile) are not in the sample tier.
+  - Fixture timestamps are historical (2021-2022 vehicle transmission times).
+  - Korea-only data; the FAQ confirms only domestic connected-car data is served.

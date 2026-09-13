@@ -1,0 +1,101 @@
+generated: '2026-09-13'
+method: searched
+source: https://developers.hyundai.com/web/v1/hyundai/notice
+provider: Hyundai
+providerId: hyundai
+name: Hyundai Developers 공지사항 (Notices)
+scheme: dated notice board
+machine_readable: false
+current_version: v1
+entry_count: 10
+window: 2021-06-30 to 2023-09-21
+note: >-
+  Hyundai Developers has no API changelog as such. Its notice board is the only dated,
+  provider-published change record, and nine of its ten entries are legal-document
+  revisions rather than API changes. Captured in full because it is small and because the
+  gap it reveals — no API-level change communication since 2022 — is the finding.
+entries:
+  - date: '2023-09-21'
+    title_ko: Hyundai Developers 통합 이전 개별 서비스 개인정보처리방침 안내(~'23.9.25)
+    title: Notice on the pre-consolidation standalone privacy policy
+    category: legal
+    breaking: false
+    highlights:
+      - >-
+        As of 2023-09-25 the Hyundai Developers privacy policy is consolidated into the
+        Hyundai Privacy Center; the previous standalone policy remains linked for reference.
+  - date: '2023-05-18'
+    title_ko: Hyundai Developers 개인정보처리방침 개정 공지
+    title: Privacy policy revision
+    category: legal
+    breaking: false
+    effective: '2026-05-24'
+    highlights:
+      - Change of privacy officer, privacy manager and responsible department.
+  - date: '2022-11-28'
+    title_ko: Hyundai Developers 개인정보처리방침 개정 공지
+    title: Privacy policy revision
+    category: legal
+    breaking: false
+    effective: '2022-12-07'
+    highlights:
+      - Change of privacy officer, privacy manager and responsible department.
+  - date: '2022-08-19'
+    title_ko: Hyundai Developers 이용약관 개정 공지
+    title: Terms of use revision
+    category: legal
+    breaking: false
+    effective: '2022-08-26'
+    highlights:
+      - >-
+        New member obligation - a member operating a commercialized service must discharge
+        the duty under Article 20 of the Personal Information Protection Act to inform data
+        subjects of the source of personal information collected from third parties.
+  - date: '2022-07-01'
+    title_ko: Hyundai Developers 서비스 개편 안내
+    title: Platform revision
+    category: platform
+    breaking: false
+    effective: '2022-06-30'
+    highlights:
+      - >-
+        API specifications opened to the public - the reference became readable without
+        signing up. This is why the 19 specification documents this profile is built from
+        are anonymously fetchable.
+      - >-
+        Open signup and self-service project creation - no document submission and no
+        approval step; anyone can register and start developing against the API immediately.
+      - Additional development-support features added to the console.
+  - date: '2022-06-23'
+    title_ko: Hyundai Developers 개인정보처리방침 개정 공지
+    title: Privacy policy revision
+    category: legal
+    breaking: false
+  - date: '2022-06-23'
+    title_ko: Hyundai Developers 이용약관 개정 공지
+    title: Terms of use revision
+    category: legal
+    breaking: false
+  - date: '2022-01-13'
+    title_ko: Hyundai Developers 개인정보처리방침 개정 공지
+    title: Privacy policy revision
+    category: legal
+    breaking: false
+  - date: '2021-08-19'
+    title_ko: Hyundai Developers 개인정보처리방침 개정 공지
+    title: Privacy policy revision
+    category: legal
+    breaking: false
+  - date: '2021-06-30'
+    title_ko: Hyundai Developers 개인정보처리방침 개정 공지
+    title: Privacy policy revision
+    category: legal
+    breaking: false
+gaps:
+  - No entry since 2023-09-21.
+  - No API-level change entry since 2022-07-01.
+  - No RSS, Atom or JSON feed for the notice board.
+  - >-
+    The specification documents carry docVer and updDt fields in the portal's own JSON
+    docs endpoint, but both are null on all 19 documents, so per-operation change history
+    is not exposed either.

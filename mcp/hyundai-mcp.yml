@@ -1,0 +1,103 @@
+generated: '2026-09-13'
+method: derived
+source: >-
+  Derived from the 19 operations Hyundai publishes at
+  https://developers.hyundai.com/web/v1/hyundai/specification/ — no MCP server exists.
+provider: Hyundai
+providerId: hyundai
+status: candidate
+deployment:
+  mode: none
+  endpoint: null
+  install: null
+  package: null
+  auth: unknown
+  verified: probed
+  note: >-
+    Hyundai ships no MCP server, hosted or local. Probed 2026-09-13:
+    developers.hyundai.com/mcp -> 404, prd.kr-ccapi.hyundai.com/mcp -> 404,
+    mcp.hyundai.com -> DNS NXDOMAIN. No npm or PyPI package under a Hyundai namespace. The
+    word "MCP" does not appear anywhere in the developer portal. No endpoint is invented
+    here.
+probes:
+  - {url: 'https://developers.hyundai.com/mcp', method: 'POST tools/list', status: 404, date: '2026-09-13'}
+  - {url: 'https://prd.kr-ccapi.hyundai.com/mcp', method: 'POST tools/list', status: 404, date: '2026-09-13'}
+  - {url: 'https://mcp.hyundai.com/', method: 'POST tools/list', status: null, error: 'DNS: could not resolve host', date: '2026-09-13'}
+candidate_tools:
+  note: >-
+    A hypothetical tool surface, listed so the shape of an MCP server for this API is on
+    record. These are NOT tools anyone can call today. Input schemas are read from the
+    provider's published parameter tables, not invented. Every vehicle tool takes carId and
+    requires a user access token plus completed PIPA third-party consent.
+  tools:
+    - name: get_user_profile
+      backing_operation: GET /api/v1/user/profile
+      inputs: []
+      returns: id, email, name, mobileNum, birthdate, lang, social
+      consequence: read
+      pii: true
+    - name: list_vehicles
+      backing_operation: GET /api/v1/car/profile/carlist
+      inputs: []
+      returns: carId list (vin where permitted)
+      consequence: read
+    - name: get_connected_service_contract
+      backing_operation: GET /api/v1/car/profile/{carId}/contract
+      inputs: [carId]
+      returns: subscribeDate, endDate
+      consequence: read
+    - name: get_odometer
+      backing_operation: GET /api/v1/car/status/{carId}/odometer
+      inputs: [carId]
+      returns: odometers[] (date, timestamp, value, unit)
+      consequence: read
+    - name: get_distance_to_empty
+      backing_operation: GET /api/v1/car/status/{carId}/dte
+      inputs: [carId]
+      consequence: read
+    - name: get_ev_battery
+      backing_operation: GET /api/v1/car/status/{carId}/ev/battery
+      inputs: [carId]
+      returns: soc
+      consequence: read
+    - name: get_ev_charging
+      backing_operation: GET /api/v1/car/status/{carId}/ev/charging
+      inputs: [carId]
+      returns: soc, targetSOC, remainTime
+      consequence: read
+    - name: get_warning_light
+      backing_operations:
+        - GET /api/v1/car/status/warning/{carId}/lowFuel
+        - GET /api/v1/car/status/warning/{carId}/tirePressure
+        - GET /api/v1/car/status/warning/{carId}/lampWire
+        - GET /api/v1/car/status/warning/{carId}/smartKeyBattery
+        - GET /api/v1/car/status/warning/{carId}/washerFluid
+        - GET /api/v1/car/status/warning/{carId}/breakOil
+        - GET /api/v1/car/status/warning/{carId}/engineOil
+      inputs: [carId, lamp]
+      returns: status (boolean)
+      consequence: read
+      note: >-
+        Seven identical-shape endpoints collapse naturally into one tool with a lamp enum.
+    - name: request_data_consent
+      backing_operation: POST /api/v1/car-service/terms/agreement
+      inputs: [token, state]
+      consequence: write
+      escalation: >-
+        Requires a human in the loop by construction — the operation returns a 302 to a
+        Hyundai-hosted consent page the vehicle owner must complete in a browser. Not
+        agent-completable.
+    - name: withdraw_data_consent
+      backing_operation: GET /api/v1/car-service/terms/reject
+      inputs: []
+      consequence: write
+      reversal_of: request_data_consent
+      note: >-
+        Triggers an outbound delete callback and a statutory obligation on the caller to
+        delete all data already received. High consequence despite being a GET.
+  tool_count: 10
+agent_readiness_note: >-
+  Read-only, Korea-only, and gated behind a manual commercialization review plus a
+  browser-based per-vehicle consent step. Even with a server, an agent could not onboard
+  itself to this API — the consent flow and the review are deliberately human. The public
+  sample-test tier is the only part an agent can reach unattended today.

@@ -1,0 +1,98 @@
+generated: '2026-09-13'
+method: searched
+source: https://developers.hyundai.com/web/v1/hyundai/notice
+provider: Hyundai
+providerId: hyundai
+versioning:
+  style: path
+  current: v1
+  policy_published: false
+  note: >-
+    All 19 documented operations are under /api/v1/. No versioning policy, no stated
+    support window for a version, and no description of how a v2 would be introduced.
+deprecation:
+  policy_published: false
+  sunset_header: false
+  deprecation_header: false
+  rfc8594: false
+  deprecated_operations: []
+  note: >-
+    No deprecation policy, no Sunset or Deprecation response headers observed on the
+    production or sample hosts, and no operation is marked deprecated in the reference.
+    The reference does carry a forward-looking marker in the other direction: the Data API
+    overview states "일부 API는 현재 개발 중에 있습니다" — some APIs are still under
+    development — and the portal advertises six API families (제원 정보 / 운행 정보 /
+    주행거리 / 차량 상태 / 차량 위치 / 운전 습관) while the specification section documents
+    only account, vehicle profile, vehicle status and warning lights. Vehicle location and
+    driving-habit APIs are marketed but not specified.
+status_page:
+  published: false
+  url: null
+  note: >-
+    No status page, no uptime history and no incident feed on any Hyundai Developers host.
+    Availability is communicated only by email to registered members and via the notice board.
+sla:
+  published: false
+  note: >-
+    No SLA. The technical-support page instead publishes an explicit support SCOPE — Hyundai
+    will answer general API questions, point at documentation, and troubleshoot faults in its
+    own platform unrelated to the caller's code; it will NOT debug the caller's application,
+    modify its API for compatibility, or patch third-party/open-source packages.
+announcements:
+  channel: notice board
+  url: https://developers.hyundai.com/web/v1/hyundai/notice
+  status: 200
+  also_by: email to registered members (per FAQ)
+  entry_count: 10
+  first_entry: '2021-06-30'
+  last_entry: '2023-09-21'
+  staleness_note: >-
+    The notice board has not been updated in just under three years as of this pass. Nine of
+    its ten entries are terms-of-use or privacy-policy revisions; exactly one
+    (2022-07-01) is a product announcement. There is no API changelog distinct from this
+    board. See changelog/hyundai-changelog.yml.
+onboarding_lifecycle:
+  stages:
+    - id: signup
+      name: 회원가입
+      description: >-
+        Hyundai integrated-account signup, then Hyundai Developers membership. Since the
+        2022-06-30 platform revision this requires no documents and no approval — simple
+        identity verification only.
+      docs: https://developers.hyundai.com/web/v1/hyundai/guide_regist
+    - id: development-project
+      name: 개발 프로젝트
+      description: >-
+        Registered in the console; issues Client ID / Client Secret and auto-grants call
+        permission on every available API. Subject to a daily per-project call cap. One
+        project per service — projects may not be reused across services.
+      docs: https://developers.hyundai.com/web/v1/hyundai/guide_console
+    - id: commercialization-review
+      name: 상용화 심사
+      description: >-
+        Manual review before any real customer vehicle data is released. States are
+        검토중 (under review) / 반려 (rejected) / 상용화 대기 (approved, waiting) /
+        상용화 가능 (live-capable). Review takes up to two weeks of business days. Rejection
+        reasons are published to the applicant, who may revise and reapply.
+      docs: https://developers.hyundai.com/web/v1/hyundai/guide_launch
+    - id: commercial-project
+      name: 상용화 프로젝트
+      description: >-
+        Auto-created on approval with its own Client ID / Client Secret; permissions are
+        granted only for the APIs approved in the review.
+  project_continuity_risk: >-
+    The console guide warns that if a project Owner withdraws from the Hyundai integrated
+    account, the projects they own are deleted and the service becomes unusable. Owner
+    transfer exists and is the documented mitigation.
+geography:
+  scope: Korea only
+  note: >-
+    The FAQ states the data is collected from connected cars in Korea and only domestic
+    vehicle data is served, and that only Korean-language site and developer guides are
+    provided. A non-Korean integrator can read the reference but cannot obtain data outside
+    Korea.
+  evidence: https://developers.hyundai.com/web/v1/hyundai/faqs
+prerequisite: >-
+  Every integration depends on the vehicle being enrolled in Bluelink, Hyundai's
+  connected-car service. Vehicles shared to or from the account are excluded from the
+  vehicle list and are unreadable.

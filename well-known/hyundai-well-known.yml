@@ -1,0 +1,161 @@
+generated: '2026-09-13'
+method: probed
+source: live HTTPS probes of the named /.well-known/ path list on every host this record knows
+note: >-
+  Six hosts probed: the registrable domain and www, the developer portal, the service
+  console, the production connected-car API host, and the US marketing site. Exactly one
+  real document was served — an RFC 9116 security.txt on www.hyundai.com, operated by
+  Hyundai AutoEver Europe. Three hosts answer every /.well-known/* path with a catch-all
+  that is NOT a document and is recorded as a miss: hyundai.com returns a 200 HTML
+  "request/response cannot be processed" page, console.developers.hyundai.com returns a
+  200 JSON ERROR_LOGIN_REQUIRED envelope for every path, and www.hyundaiusa.com 301s
+  every path to its /us/en/404 soft-404 page.
+hosts:
+  - host: www.hyundai.com
+    documents:
+      - path: /.well-known/security.txt
+        status: 200
+        file: hyundai-security.txt
+        content_type: text/plain; charset=UTF-8
+      - path: /.well-known/openid-configuration
+        status: 404
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+      - path: /.well-known/oauth-protected-resource
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+  - host: hyundai.com
+    note: every path returns 200 with an HTML edge-error page, not a document — recorded as a miss
+    documents:
+      - path: /.well-known/security.txt
+        status: 200
+        file: null
+        soft_miss: true
+      - path: /.well-known/openid-configuration
+        status: 200
+        soft_miss: true
+      - path: /.well-known/oauth-authorization-server
+        status: 200
+        soft_miss: true
+      - path: /.well-known/oauth-protected-resource
+        status: 200
+        soft_miss: true
+      - path: /.well-known/api-catalog
+        status: 200
+        soft_miss: true
+      - path: /.well-known/ai-plugin.json
+        status: 200
+        soft_miss: true
+      - path: /.well-known/agent-card.json
+        status: 200
+        soft_miss: true
+      - path: /.well-known/agent.json
+        status: 200
+        soft_miss: true
+  - host: developers.hyundai.com
+    note: developer portal; all paths 404 to the portal's HTML error page
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/openid-configuration
+        status: 404
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+      - path: /.well-known/oauth-protected-resource
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+  - host: console.developers.hyundai.com
+    note: >-
+      service console; answers every path with 200 application/json
+      {"result":"FAIL","code":"ERROR_LOGIN_REQUIRED"} — an auth envelope, not a document
+    documents:
+      - path: /.well-known/security.txt
+        status: 200
+        soft_miss: true
+      - path: /.well-known/openid-configuration
+        status: 200
+        soft_miss: true
+      - path: /.well-known/oauth-authorization-server
+        status: 200
+        soft_miss: true
+      - path: /.well-known/oauth-protected-resource
+        status: 200
+        soft_miss: true
+      - path: /.well-known/api-catalog
+        status: 200
+        soft_miss: true
+      - path: /.well-known/ai-plugin.json
+        status: 200
+        soft_miss: true
+      - path: /.well-known/agent-card.json
+        status: 200
+        soft_miss: true
+      - path: /.well-known/agent.json
+        status: 200
+        soft_miss: true
+  - host: prd.kr-ccapi.hyundai.com
+    note: production connected-car API host; clean 404 text/plain "Not Found" on every path
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/openid-configuration
+        status: 404
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+      - path: /.well-known/oauth-protected-resource
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+  - host: www.hyundaiusa.com
+    note: every path 301s to https://www.hyundaiusa.com/us/en/404, a soft-404 — recorded as a miss
+    documents:
+      - path: /.well-known/security.txt
+        status: 301
+        soft_miss: true
+      - path: /.well-known/openid-configuration
+        status: 301
+        soft_miss: true
+      - path: /.well-known/oauth-authorization-server
+        status: 301
+        soft_miss: true
+      - path: /.well-known/oauth-protected-resource
+        status: 301
+        soft_miss: true
+      - path: /.well-known/api-catalog
+        status: 301
+        soft_miss: true
+      - path: /.well-known/ai-plugin.json
+        status: 301
+        soft_miss: true
+      - path: /.well-known/agent-card.json
+        status: 301
+        soft_miss: true
+      - path: /.well-known/agent.json
+        status: 301
+        soft_miss: true
+agent_card:
+  found: false
+  note: >-
+    No A2A agent card on any host. Every 200 returned on an agent-card path was an HTML
+    shell or a JSON auth envelope, never an AgentCard object. Per the pipeline contract
+    nothing was written to a2a/ and no AgentCard pointer was emitted.

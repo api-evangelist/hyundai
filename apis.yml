@@ -1,11 +1,17 @@
 aid: hyundai
 name: Hyundai
 description: >-
-  Hyundai Motor Company is a South Korean multinational automotive
-  manufacturer specializing in designing and producing a wide range of
-  vehicles including cars, SUVs, and commercial vehicles. Hyundai operates a
-  developer portal exposing connected vehicle services, mobility solutions,
-  and partner integration touchpoints.
+  Hyundai Motor Company is a South Korean multinational automotive manufacturer and, through
+  Hyundai Developers, the operator of a connected-car data platform for third-party
+  developers. The platform exposes the Hyundai integrated account over OAuth 2.0 and serves
+  nineteen documented REST operations covering user profile, vehicle list, connected-service
+  contract dates, odometer, distance-to-empty, EV battery and charging state, and seven
+  warning-light indicators, sourced from vehicles enrolled in Bluelink. Access is governed by
+  a two-stage consent model built around the Korean Personal Information Protection Act — a
+  per-vehicle OAuth consent plus a separate third-party data-provision consent — and a manual
+  commercialization review before any real customer vehicle data is released. The API
+  reference, a public sample-test tier with fixture vehicles, and the developer guide are all
+  readable without an account; data is limited to vehicles in South Korea.
 url: >-
   https://raw.githubusercontent.com/api-evangelist/hyundai/refs/heads/main/apis.yml
 type: Index
@@ -13,7 +19,7 @@ deliveryModel:
   model: unknown
   open_source: false
   commercial: false
-  callable_host: false
+  callable_host: true
   label: Delivery model not determined — needs a product licence on record
   confidence: low
   source:
@@ -21,19 +27,21 @@ deliveryModel:
   generated: '2026-08-28'
   method: derived
 accessModel:
-  pricing: freemium
-  onboarding: unknown
-  trial: false
-  try_now: false
-  public: false
-  label: Freemium
-  confidence: medium
+  pricing: free
+  onboarding: review-gated
+  trial: true
+  try_now: true
+  public: true
+  label: Free today, commercialization review required for production
+  confidence: high
   source:
   - plans
-  - {url: 'https://www.hyundai.com/', status: 301, note: 'declared website redirects to https://www.hyundaiusa.com/us/en — a different registrable domain (hyundai.com -> hyundaiusa.com), possible rename or acquisition (probed 2026-09-03, roadmap#169)'}
-  generated: '2026-07-22'
-  method: derived
-position: Consuming
+  - {url: 'https://developers.hyundai.com/web/v1/hyundai/faqs', status: 200, note: 'provider states API use has been free to date and that charging is decided in consultation at commercialization review (probed 2026-09-13)'}
+  - {url: 'https://developers.hyundai.com/api/v1/sampleTest/getSampleTestInfo', status: 200, note: 'anonymous public sample-test tier issues a token and five fixture vehicles with no signup (probed 2026-09-13)'}
+  - {url: 'https://www.hyundai.com/', status: 301, note: 'declared corporate website redirects to https://www.hyundaiusa.com/us/en for US clients, but continues to serve /.well-known/security.txt and /llms.txt directly (probed 2026-09-13)'}
+  generated: '2026-09-13'
+  method: searched
+position: Producing
 access: 3rd-Party
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/hyundai.png
 tags:
@@ -42,44 +50,114 @@ tags:
   - Connected Vehicles
   - Mobility
   - Vehicles
+  - Automotive
+  - Telematics
+  - Electric Vehicles
+  - Vehicle Data
+  - South Korea
 created: '2025-02-25'
-modified: '2026-04-28'
+modified: '2026-09-13'
 specificationVersion: '0.23'
 apis:
   - aid: hyundai:hyundai-developer-api
-    name: Hyundai Developer API
+    name: Hyundai Developers Connected Car API
     description: >-
-      Hyundai's developer platform provides APIs for connected vehicle
-      services including remote control, vehicle status, energy management,
-      diagnostics, and other mobility features for partners and integrators.
-    humanURL: https://developer.hyundai.com/
+      Hyundai Developers exposes connected-car data from Bluelink-enrolled vehicles to
+      third-party services over a REST API on prd.kr-ccapi.hyundai.com. Nineteen operations
+      are published across five groups: account (OAuth authorize, token issue/refresh/delete,
+      user profile), vehicle profile (vehicle list, connected-service contract), vehicle
+      status (odometer, distance to empty, EV battery, EV charging), warning lights (seven
+      lamps), and service consent (third-party provision agreement and withdrawal), plus one
+      outbound delete callback. Authentication is OAuth 2.0 authorization code with a Bearer
+      access token; there is no published OpenAPI. Data is limited to vehicles in South Korea.
+    humanURL: https://developers.hyundai.com/
+    baseURL: https://prd.kr-ccapi.hyundai.com
+    image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/hyundai.png
     tags:
       - Automotive
       - Connected Vehicles
       - Mobility
       - Telematics
+      - Electric Vehicles
     properties:
       - type: Portal
-        url: https://developer.hyundai.com/
+        url: https://developers.hyundai.com/
       - type: Documentation
-        url: https://developer.hyundai.com/
+        url: https://developers.hyundai.com/web/v1/hyundai/data_api
+      - type: APIReference
+        url: https://developers.hyundai.com/web/v1/hyundai/specification/account
+      - type: GettingStarted
+        url: https://developers.hyundai.com/web/v1/hyundai/guide_developers
+      - type: Authentication
+        url: authentication/hyundai-authentication.yml
+      - type: ErrorCatalog
+        url: errors/hyundai-error-codes.yml
+      - type: Conventions
+        url: conventions/hyundai-conventions.yml
+      - type: DataModel
+        url: data-model/hyundai-data-model.yml
+      - type: Examples
+        url: examples/hyundai-examples.yml
+      - type: Sandbox
+        url: sandbox/hyundai-sandbox.yml
+      - type: Webhooks
+        url: asyncapi/hyundai-webhooks.yml
+      - type: RateLimits
+        url: rate-limits/hyundai-rate-limits.yml
+      - type: X-MCPServerCandidate
+        url: mcp/hyundai-mcp.yml
 common:
+  - type: DeveloperPortal
+    url: https://developers.hyundai.com/
+  - type: Documentation
+    url: https://developers.hyundai.com/web/v1/hyundai/data_api
+  - type: APIReference
+    url: https://developers.hyundai.com/web/v1/hyundai/specification/account
+  - type: GettingStarted
+    url: https://developers.hyundai.com/web/v1/hyundai/guide_developers
+  - type: Support
+    url: https://developers.hyundai.com/web/v1/hyundai/tech_support
+  - type: HelpCenter
+    url: https://developers.hyundai.com/web/v1/hyundai/faqs
+  - type: SignUp
+    url: https://console.developers.hyundai.com/
+  - type: TermsOfService
+    url: https://developers.hyundai.com/web/v1/hyundai/terms_of_use
+  - type: PrivacyPolicy
+    url: https://privacy.hyundai.com/overview/full-policy
+  - type: ChangeLog
+    url: changelog/hyundai-changelog.yml
+  - type: Lifecycle
+    url: lifecycle/hyundai-lifecycle.yml
+  - type: Conformance
+    url: conformance/hyundai-conformance.yml
+  - type: Packages
+    url: packages/hyundai-packages.yml
+  - type: LLMsTxt
+    url: llms/hyundai-llms.txt
+  - type: WellKnown
+    url: well-known/hyundai-well-known.yml
+  - type: SecurityTxt
+    url: well-known/hyundai-security.txt
+  - type: Security
+    url: security/hyundai-vulnerability-disclosure.yml
   - type: VulnerabilityDisclosure
     url: security/hyundai-vulnerability-disclosure.yml
   - type: DomainSecurity
     url: security/hyundai-domain-security.yml
-  - type: GitHubOrganization
-    url: https://github.com/hyundai
+  - type: Plans
+    url: plans/hyundai-plans-pricing.yml
   - type: LinkedIn
     url: https://www.linkedin.com/company/hyundai-motor-company
   - type: Website
     url: https://www.hyundai.com/
-  - type: USWebsite
-    url: https://www.hyundaiusa.com/
-  - type: Portal
-    url: https://developer.hyundai.com/
   - type: Newsroom
     url: https://www.hyundainews.com/
 maintainers:
   - FN: Kin Lane
     email: kin@apievangelist.com
+x-enrichment:
+  date: '2026-09-13'
+  status: enriched
+  artifacts_added: 16
+  pass: local-v3

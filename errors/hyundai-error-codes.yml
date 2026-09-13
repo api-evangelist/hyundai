@@ -1,0 +1,134 @@
+generated: '2026-09-13'
+method: searched
+source: https://developers.hyundai.com/common/js/project/api_specification.js
+docs: https://developers.hyundai.com/web/v1/hyundai/specification/data/status_odometer
+provider: Hyundai
+providerId: hyundai
+format: custom
+rfc9457: false
+note: >-
+  Hyundai Developers publishes a numeric error-code registry that the specification pages
+  render beneath every operation. The registry is split: one table applies to the Data API
+  group, a second to the Account API group. The envelope is a flat JSON object, not
+  application/problem+json, so rfc9457 is false. Error codes are string-typed in the
+  envelope even though they read as integers.
+envelope:
+  media_type: application/json
+  fields:
+    - name: errId
+      type: string
+      description: Error ID (UUID) for support correlation; matches the Ccsp-Request-Id response header
+    - name: errCode
+      type: string
+      description: Numeric error code from the registry below
+    - name: errMsg
+      type: string
+      description: Human-readable detail
+  example: |
+    {
+      "errId": "123e4567-e89b-12d3-a456-426655440000",
+      "errCode": "4002",
+      "errMsg": "Invalid request body"
+    }
+  redirect_variant:
+    description: >-
+      The consent-request operation (POST /api/v1/car-service/terms/agreement) is a browser
+      redirect flow, so it returns errors as query parameters on a 302 Location rather than
+      as a JSON body — the same three field names, URL-encoded.
+    example: 'Location: redirect_url?errCode=4046&errMsg=No%20registered%20vehicles&errId=123e4567-...'
+observed:
+  - probe: GET https://prd.kr-ccapi.hyundai.com/api/v1/user/profile (unauthenticated)
+    date: '2026-09-13'
+    http_status: 401
+    errCode: '4010'
+    errMsg: Require authentication
+groups:
+  - id: data
+    name: Data API
+    applies_to: vehicle profile, vehicle status, warning-light and consent operations
+    codes:
+      - code: '4002'
+        message: Invalid Request Body
+        meaning_ko: 호출 인자 값 오류
+        meaning: Bad call argument value
+      - code: '4011'
+        message: Invalid Authorization Header
+        meaning: Header value error
+      - code: '4012'
+        message: Invalid Session
+        meaning: Session value error
+      - code: '4014'
+        message: No Service term
+        meaning: >-
+          Terms not registered for the project. The provider's own remediation is to
+          contact developers@hyundai.com to request registration.
+        remediation_contact: developers@hyundai.com
+      - code: '4016'
+        message: Unauthorized Client
+        meaning: Service authentication value error
+      - code: '4043'
+        message: Unregistered User
+        meaning: Information requested for a customer not enrolled in Connected Car Service (CCS)
+      - code: '4045'
+        message: No data
+        meaning: >-
+          Data unavailable — long-dormant vehicle, telematics unit transmission failure,
+          or similar
+      - code: '4046'
+        message: No Registered Vehicles
+        meaning: Customer owns no vehicle, so no data can be provided
+      - code: '4120'
+        message: Pre-operation is required
+        meaning: >-
+          A prerequisite API was not called first — in practice the third-party consent
+          operation before any vehicle data read
+      - code: '5001'
+        message: Internal Server Error
+        meaning: Internal API error
+      - code: '5004'
+        message: Internal Server Permission Error
+        meaning: Internal API error
+      - code: '5041'
+        message: Gateway Timeout
+        meaning: Timeout error
+      - code: '9999'
+        message: Undefined Error
+        meaning: Internal API error
+  - id: account
+    name: Account API
+    applies_to: login authorization, token issue/refresh/delete, user profile
+    codes:
+      - code: '4002'
+        message: Invalid Request Body
+        meaning: Bad call argument value
+      - code: '4003'
+        message: Invalid Request Value
+        meaning: User-supplied value wrong, e.g. password mismatch
+      - code: '4010'
+        message: Require authentication
+        meaning: Call value error on token issue
+      - code: '4011'
+        message: Invalid Access Token
+        meaning: Access token value error
+      - code: '4012'
+        message: Deactivated User
+        meaning: >-
+          Account converted to dormant after one year without login
+      - code: '4081'
+        message: Request Timeout
+        meaning: Timeout error
+      - code: '4121'
+        message: No Context
+        meaning: Raised when the failure is not classified by a more specific code
+      - code: '5001'
+        message: Internal Server Error
+        meaning: Internal API error
+      - code: '9999'
+        message: Undefined Error
+        meaning: Internal API error
+code_count: 22
+collision_note: >-
+  4002, 4011, 4012, 5001 and 9999 appear in BOTH groups, and 4011/4012 carry DIFFERENT
+  meanings depending on group (4012 is "Invalid Session" on the Data API and "Deactivated
+  User" on the Account API). A client cannot interpret errCode without also knowing which
+  API group it called.

@@ -1,0 +1,150 @@
+generated: '2026-09-13'
+method: derived
+source: >-
+  Derived from the 19 API specification documents Hyundai publishes at
+  https://developers.hyundai.com/api/v1/specification/contents/{group}/{code} — the field
+  tables and response examples on each operation page. No OpenAPI exists; there are no
+  $ref links to walk, so the graph is read from the identifier fields the operations
+  exchange.
+provider: Hyundai
+providerId: hyundai
+identifiers:
+  - name: userId
+    alias: id
+    type: string (UUID)
+    description: Hyundai-issued unique user identifier (당사 발급 사용자 고유 식별자)
+    issued_by: Hyundai
+    appears_in: [user profile, consent request, delete callback]
+  - name: carId
+    type: string (UUID)
+    description: Hyundai-issued unique vehicle identifier (당사 발급 차량 고유 식별자)
+    issued_by: Hyundai
+    appears_in: [vehicle list, contract, all status, all warning, delete callback]
+    note: >-
+      The single most important identifier on the surface — it is the path parameter for
+      every vehicle read, and it is only obtainable from the vehicle-list operation after
+      both OAuth consent and PIPA third-party consent have completed.
+  - name: vin
+    type: string
+    description: Vehicle identification number
+    issued_by: manufacturer
+    restricted: true
+    note: Released only to services holding explicit VIN access permission.
+  - name: msgId
+    type: string (UUID)
+    description: Per-response message identifier for confirming the request result
+  - name: errId
+    type: string (UUID)
+    description: Error identifier; observed to equal the Ccsp-Request-Id response header
+entities:
+  - name: User
+    source_operation: GET /api/v1/user/profile
+    primary_key: id
+    fields:
+      - {name: id, type: string, pii: false}
+      - {name: email, type: string, pii: true}
+      - {name: name, type: string, pii: true}
+      - {name: mobileNum, type: string, pii: true}
+      - {name: birthdate, type: string, pii: true}
+      - {name: lang, type: string, enum: [ko, en, zh]}
+      - {name: social, type: boolean, description: whether registered via social login}
+    note: >-
+      This is a direct-identifier PII payload. Nothing in this repository stores real values
+      from it; the field list is read from the provider's published field table.
+  - name: Vehicle
+    source_operation: GET /api/v1/car/profile/carlist
+    primary_key: carId
+    fields:
+      - {name: carId, type: string}
+      - {name: vin, type: string, restricted: true}
+    note: >-
+      Vehicles shared to or from the account do not appear in the list and are unreadable.
+  - name: ConnectedServiceContract
+    source_operation: GET /api/v1/car/profile/{carId}/contract
+    fields:
+      - {name: subscribeDate, type: date (YYYYMMDD)}
+      - {name: endDate, type: date (YYYYMMDD), optional: true, description: free-service end date}
+      - {name: msgId, type: string}
+    note: >-
+      For new vehicles from 2020, the first Bluelink enrolment carries five years of free
+      service; endDate is when that free period lapses.
+  - name: Odometer
+    source_operation: GET /api/v1/car/status/{carId}/odometer
+    fields:
+      - {name: date, type: date (YYYYMMDD)}
+      - {name: timestamp, type: datetime (YYYYMMDDHHmmSS), description: time the vehicle transmitted}
+      - {name: value, type: number}
+      - {name: unit, type: integer, enum_map: {0: feet, 1: km, 2: meter, 3: miles}}
+    cardinality: array (odometers[])
+    note: Updated at engine-off, per the operation description.
+  - name: DistanceToEmpty
+    source_operation: GET /api/v1/car/status/{carId}/dte
+    fields:
+      - {name: value, type: number}
+      - {name: unit, type: integer}
+      - {name: timestamp, type: datetime}
+  - name: EvBattery
+    source_operation: GET /api/v1/car/status/{carId}/ev/battery
+    fields:
+      - {name: soc, type: integer, description: state of charge, percent}
+      - {name: timestamp, type: datetime}
+  - name: EvCharging
+    source_operation: GET /api/v1/car/status/{carId}/ev/charging
+    fields:
+      - {name: soc, type: integer}
+      - {name: targetSOC, type: object, subfields: [plugType, targetSOClevel]}
+      - {name: remainTime, type: object}
+      - {name: timestamp, type: datetime}
+  - name: WarningLight
+    source_operations:
+      - GET /api/v1/car/status/warning/{carId}/lowFuel
+      - GET /api/v1/car/status/warning/{carId}/tirePressure
+      - GET /api/v1/car/status/warning/{carId}/lampWire
+      - GET /api/v1/car/status/warning/{carId}/smartKeyBattery
+      - GET /api/v1/car/status/warning/{carId}/washerFluid
+      - GET /api/v1/car/status/warning/{carId}/breakOil
+      - GET /api/v1/car/status/warning/{carId}/engineOil
+    fields:
+      - {name: status, type: boolean, description: true when the warning lamp is lit}
+      - {name: msgId, type: string}
+    note: >-
+      Seven operations share one identical response shape. A single parameterised endpoint
+      would have expressed this; Hyundai models it as seven separate paths.
+  - name: ThirdPartyConsent
+    source_operations:
+      - POST /api/v1/car-service/terms/agreement
+      - GET /api/v1/car-service/terms/reject
+    fields:
+      - {name: userId, type: string}
+      - {name: state, type: string}
+  - name: DeleteNotification
+    source: outbound webhook to the partner Callback URL
+    fields:
+      - {name: type, type: string, enum: [account, vehicle, agreement]}
+      - {name: action, type: string, enum: [delete, reject]}
+      - {name: userId, type: string, optional: true}
+      - {name: carId, type: string, optional: true}
+      - {name: vin, type: string, optional: true, restricted: true}
+relationships:
+  - {from: User, to: Vehicle, type: has_many, via: carId, note: via GET /car/profile/carlist}
+  - {from: Vehicle, to: ConnectedServiceContract, type: has_one, via: carId}
+  - {from: Vehicle, to: Odometer, type: has_many, via: carId}
+  - {from: Vehicle, to: DistanceToEmpty, type: has_one, via: carId}
+  - {from: Vehicle, to: EvBattery, type: has_one, via: carId, note: EV vehicles only}
+  - {from: Vehicle, to: EvCharging, type: has_one, via: carId, note: EV vehicles only}
+  - {from: Vehicle, to: WarningLight, type: has_many, via: carId, note: seven distinct lamps}
+  - {from: User, to: ThirdPartyConsent, type: has_one, via: userId}
+  - {from: ThirdPartyConsent, to: Vehicle, type: belongs_to, via: carId}
+  - {from: DeleteNotification, to: User, type: belongs_to, via: userId}
+  - {from: DeleteNotification, to: Vehicle, type: belongs_to, via: carId}
+access_path:
+  description: >-
+    The graph is not reachable from the root. An integrator must traverse a fixed five-step
+    path before a single vehicle field can be read, and the API enforces it — calling out of
+    order returns error 4120, "Pre-operation is required".
+  steps:
+    - 1. OAuth authorize + token — obtain access_token
+    - 2. POST /car-service/terms/agreement — obtain PIPA third-party consent
+    - 3. GET /car/profile/carlist — obtain carId
+    - 4. GET /car/profile/{carId}/contract — confirm connected-service status
+    - 5. GET /car/status/... or /car/status/warning/... — read data

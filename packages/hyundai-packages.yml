@@ -1,0 +1,82 @@
+generated: '2026-09-13'
+method: searched
+source: >-
+  Registry searches of npm, PyPI, Maven Central, RubyGems, crates.io and pkg.go.dev plus a
+  full read of the Hyundai Developers portal's guide and specification sections.
+provider: Hyundai
+providerId: hyundai
+official_package_count: 0
+package_count: 0
+packages: []
+note: >-
+  Hyundai publishes NO first-party client library in any language. The developer guide ships
+  copy-paste code samples only — raw HTML anchor, Node/Express, and Java Spring snippets
+  that call the endpoints with a plain HTTP client. There is no Hyundai-owned package on any
+  registry and no SDK download on the portal. No SDKs pointer is emitted, because there is
+  no SDK.
+first_party_distribution:
+  form: inline code samples
+  location: https://developers.hyundai.com/web/v1/hyundai/guide_api
+  languages: [html, javascript, java, nodejs]
+  versioned: false
+  note: Samples are embedded in the guide page; they are not versioned or distributed.
+third_party_wrappers:
+  note: >-
+    A substantial community ecosystem wraps Hyundai's Bluelink app APIs — which are NOT the
+    documented Hyundai Developers platform, and are reverse-engineered from the mobile
+    client. Recorded here to prevent a future pass from mistaking one for an official SDK.
+    None is first-party and none is endorsed by Hyundai.
+  packages:
+    - language: javascript
+      registry: npm
+      name: bluelinky
+      url: https://www.npmjs.com/package/bluelinky
+      version: 10.0.0
+      published: '2025-08-13'
+      official: false
+      self_described: An unofficial nodejs API wrapper for Hyundai bluelink
+    - language: python
+      registry: pypi
+      name: hyundai-kia-connect-api
+      url: https://pypi.org/project/hyundai-kia-connect-api/
+      version: 4.31.0
+      published: null
+      published_note: >-
+        Release date not read from the registry metadata in this pass; the version is
+        current as of 2026-09-13.
+      official: false
+      self_described: Python API for Hyundai, Kia, and Genesis car infotainment systems
+      source: https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api
+    - language: javascript
+      registry: npm
+      name: iobroker.bluelink
+      url: https://www.npmjs.com/package/iobroker.bluelink
+      version: 3.1.33
+      published: '2026-08-22'
+      official: false
+      self_described: Adapter to control Hyundai or Kia vehicle
+    - language: javascript
+      registry: npm
+      name: homebridge-bluelink-3-0
+      url: https://www.npmjs.com/package/homebridge-bluelink-3-0
+      version: 3.0.3
+      published: '2026-08-06'
+      official: false
+      self_described: Integrates with remote functionality for Hyundai cars
+registries_searched:
+  - {registry: npm, hits_first_party: 0, date: '2026-09-13'}
+  - {registry: pypi, hits_first_party: 0, date: '2026-09-13'}
+  - {registry: maven-central, hits_first_party: 0, date: '2026-09-13'}
+  - {registry: rubygems, hits_first_party: 0, date: '2026-09-13'}
+  - {registry: crates.io, hits_first_party: 0, date: '2026-09-13'}
+  - {registry: pkg.go.dev, hits_first_party: 0, date: '2026-09-13'}
+github:
+  note: >-
+    github.com/hyundai resolves to an EMPTY GitHub USER account (type: User, 0 public
+    repositories, created 2011-08-22, no name, no bio, no linked site) — not a Hyundai Motor
+    Company organization. api.github.com/orgs/hyundai returns 404. No Hyundai Motor
+    engineering org was found. The stale GitHubOrganization pointer in apis.yml was removed
+    on this pass for that reason.
+  probed: https://api.github.com/orgs/hyundai
+  status: 404
+  date: '2026-09-13'
