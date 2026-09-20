@@ -2,16 +2,16 @@
 kin_checks:
   slug: hyundai
   schema_version: 0.22.0
-  scored_at: '2026-09-18'
-  run_ts: 2026-09-18T231945
+  scored_at: '2026-09-19'
+  run_ts: 2026-09-19T193153
   note: Actionable checks (missed + partial) in `checks`, plus the ids that did not
     apply in `na`. Everything else in rubric/scoring-0.22.0.yml was earned; counts
     below let you verify that.
   counts:
     total: 136
-    earned: 36
-    partial: 6
-    missed: 51
+    earned: 35
+    partial: 5
+    missed: 53
     na: 43
   checks:
   - id: multiple_apis
@@ -76,12 +76,18 @@ kin_checks:
     status: missed
   - id: pricing_link
     status: missed
+  - id: privacy_policy
+    status: missed
+    detail: pointer liveness 0.0
   - id: compliance_published
     status: missed
   - id: trust_center
     status: missed
   - id: reg_oauth_scopes
     status: missed
+  - id: reg_privacy_policy
+    status: missed
+    detail: pointer liveness 0.0
   - id: reg_compliance_published
     status: missed
   - id: upsert_outcome_discriminator
@@ -119,10 +125,6 @@ kin_checks:
   - id: examples_present
     status: partial
     earned: 1.0
-  - id: documentation_present
-    status: partial
-    earned: 2.0
-    detail: pointer liveness 0.5
   - id: auth_clarity
     status: partial
     earned: 3.5
