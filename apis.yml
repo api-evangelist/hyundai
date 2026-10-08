@@ -107,6 +107,10 @@ apis:
       - type: X-MCPServerCandidate
         url: mcp/hyundai-mcp.yml
 common:
+  - type: RateLimits
+    url: rate-limits/hyundai-rate-limits.yml
+  - type: FinOps
+    url: finops/hyundai-finops.yml
   - type: DeveloperPortal
     url: https://developers.hyundai.com/
   - type: Documentation
